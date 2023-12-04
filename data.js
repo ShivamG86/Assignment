@@ -79,32 +79,41 @@ app.get("/purchases", function (req, res) {
             let purchasesArray = JSON.parse(data);
 
             const { shop, product, sort } = req.query;
-            const shopIds = shop ? shop.split(",").map(id => +id) : [];
+            const shopIds = shop ? shop.split(",").map(id => +id.replace("st", "")) : [];
+
+            let productIds = [];
+            if (product) {
+     
+                productIds = product.split(",").map(id => +id.replace("pr", ""));
+            }
 
             if (shopIds.length > 0) {
                 purchasesArray = purchasesArray.filter((purchase) => shopIds.includes(purchase.shopId));
             }
 
-            if (product) {
-                purchasesArray = purchasesArray.filter((purchase) => purchase.productId === +product);
+            if (productIds.length > 0) {
+                purchasesArray = purchasesArray.filter((purchase) => productIds.includes(purchase.productId));
             }
 
             if (sort) {
-               if(sort === "QtyAsc"){
-                purchasesArray = purchasesArray.sort((a,b) => a.quantity - b.quantity);
-               }else if(sort === "QtyDesc"){
-                purchasesArray = purchasesArray.sort((a,b) => b.quantity - a.quantity);
-               }else if(sort === "ValueAsc"){
-                purchasesArray = purchasesArray.sort((a,b) => a.quantity*a.price - b.quantity*b.price);
-               }else if(sort === "ValueDesc"){
-                purchasesArray = purchasesArray.sort((a,b) => b.quantity*b.price - a.quantity*a.price);
-               }
+
+                if(sort === "QtyAsc"){
+                    purchasesArray = purchasesArray.sort((a,b) => a.quantity - b.quantity);
+                } else if(sort === "QtyDesc"){
+                    purchasesArray = purchasesArray.sort((a,b) => b.quantity - a.quantity);
+                } else if(sort === "ValueAsc"){
+                    purchasesArray = purchasesArray.sort((a,b) => a.quantity*a.price - b.quantity*b.price);
+                } else if(sort === "ValueDesc"){
+                    purchasesArray = purchasesArray.sort((a,b) => b.quantity*b.price - a.quantity*a.price);
+                }
             }
 
             res.send(purchasesArray);
         }
     });
 });
+
+
 
 
 app.get("/totalPurchase/shop/:id", function (req, res) {
